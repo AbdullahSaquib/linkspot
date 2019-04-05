@@ -232,21 +232,10 @@ def like_comment(request):
     return JsonResponse(json_context)
 
 def goto_page(request, page_id):
-    # page_id = None
-    # if request.method == 'GET':
-    #     page_id = request.GET['page_id']
-    #     try :
-    #         page = Page.objects.get(id=page_id)
-    #         page.views += 1
-    #         page.save()
-    #         return redirect(page.url)
-    #     except Page.DoesNotExist:
-    #         pass
     page = get_object_or_404(Page, id=page_id)
     page.views += 1
     page.save()
     return redirect(page.url)
-    # return HttpResponse("Visiting page feature will be available soon:"+str(page_id))
 
 def about(request):
     return HttpResponse("Linkspot is a social link sharing platform.")
@@ -280,7 +269,3 @@ def see_replies(request):
 
 def del_cat_successfull(request):
     return render(request, 'catlin/del_cat_success.html',{})
-
-#like_page(contains like/dislike/unlike)
-#like_comment, post_comment, delete_comment, edit_comment, view_commment_list
-#

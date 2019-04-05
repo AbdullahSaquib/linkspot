@@ -12,6 +12,7 @@ function getCookie(name) {
   }
   return cookieValue;
 }
+
 function csrfSafeMethod(method) {
   return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
 }
@@ -68,7 +69,7 @@ function mainCommentHtml(id, content, username, last_modified, like_count, disli
   return mchtml;
 }
 
-function post_comment() {
+function postComment() {
   console.log('Post comment is working');
   var catid = $('#comment-btn').attr('data-catid');
   var comment;
@@ -95,7 +96,7 @@ function post_comment() {
   $('#new-comment').val('');
 }
 
-function post_nested_comment(commentid) {
+function postNestedComment(commentid) {
   var catid = $('#comments').attr('data-catid');
   var content = $('#new-comment'+commentid).val();
   console.log('Received(cat-id:'+catid+', comment-id: '+commentid+'): '+content);
@@ -110,7 +111,6 @@ function post_nested_comment(commentid) {
     },
     success: function(json) {
       $('#new-comment'+commentid).val('');
-      // username, ncid, content, likes, dislikes
       $('#see-replies-btn'+commentid).html(json.parent_comment_count+' Replies');
       $('#div_see_replies'+commentid).prepend(nestedCommentsHtml(json.username, json.id, json.content, json.like_count, json.dislike_count));
       console.log(json);
@@ -124,6 +124,24 @@ function post_nested_comment(commentid) {
   $('#new-comment'+commentid).val('');
 }
 
+function likeDislikeCategory(parThis, likeType) {
+  var catid = $(parThis).attr('data-catid');
+  $.post('/linkgroup/like_category/', {entity_id : catid, liketype:likeType}, function(data){
+    $('#like_counts').html(data.likes);
+    $('#dislike_counts').html(data.dislikes);
+  });
+}
+
+function likeDislikePageComment(parThis, entity_type, likeType) {
+  var pageid = $(parThis).attr("data-"+entity_type+"id");
+  lpc_id_name = "#like_"+entity_type+"_count"+pageid;
+  dlpc_id_name = "#dislike_"+entity_type+"_count"+pageid;
+  $.post("/linkgroup/like_"+entity_type+"/", {entity_id : pageid, liketype: likeType}, function(data){
+    $(lpc_id_name).html(data.likes);
+    $(dlpc_id_name).html(data.dislikes);
+  });
+}
+
 $(document).ready( function() {
     $.ajaxSetup({
       beforeSend: function(xhr, settings) {
@@ -134,73 +152,30 @@ $(document).ready( function() {
     });
 
     $("#likes").click( function(event) {
-        var catid = $(this).attr('data-catid');
-        $.post('/linkgroup/like_category/', {entity_id : catid, liketype:'L'}, function(data){
-          $('#like_counts').html(data.likes);
-          $('#dislike_counts').html(data.dislikes);
-        });
+        likeDislikeCategory(this, 'L');
     });
 
     $("#dislikes").click( function(event) {
-        var catid = $(this).attr('data-catid');
-        $.ajax({
-          url:'/linkgroup/like_category/',
-          type: 'post',
-          data: {
-            entity_id:catid,
-            liketype:'D'
-          },
-          datatype:'json',
-          success : function(data){
-            $('#like_counts').html(data.likes);
-            $('#dislike_counts').html(data.dislikes);
-          }
-       });
+      likeDislikeCategory(this, 'D');
     });
 
     $(".like_page").click( function(event) {
-        var pageid = $(this).attr('data-pageid');
-        lpc_id_name = "#like_page_count"+pageid;
-        dlpc_id_name = "#dislike_page_count"+pageid;
-        $.post('/linkgroup/like_page/', {entity_id : pageid, liketype:'L'}, function(data){
-          $(lpc_id_name).html(data.likes);
-          $(dlpc_id_name).html(data.dislikes);
-        });
+      likeDislikePageComment(this, 'page', 'L');
     });
 
     $(".dislike_page").click( function(event) {
-        var pageid = $(this).attr('data-pageid');
-        lpc_id_name = "#like_page_count"+pageid;
-        dlpc_id_name = "#dislike_page_count"+pageid;
-        $.post('/linkgroup/like_page/', {entity_id : pageid, liketype:'D'}, function(data){
-          $(lpc_id_name).html(data.likes);
-          $(dlpc_id_name).html(data.dislikes);
-        });
+      likeDislikePageComment(this, 'page', 'D');
     });
 
-    // $(".like_comment").click( function(event) {
-    //     var commentid = $(this).attr('data-commentid');
-    //     lcc_id_name = "#like_comment_count"+commentid;
-    //     dlcc_id_name = "#dislike_comment_count"+commentid;
-    //     $.post('/linkgroup/like_comment/', {entity_id : commentid, liketype:'L'}, function(data){
-    //       $(lcc_id_name).html(data.likes);
-    //       $(dlcc_id_name).html(data.dislikes);
-    //     });
-    // });
-    //
-    // $(".dislike_comment").click( function(event) {
-    //     var commentid = $(this).attr('data-commentid');
-    //     lcc_id_name = "#like_comment_count"+commentid;
-    //     dlcc_id_name = "#dislike_comment_count"+commentid;
-    //     $.post('/linkgroup/like_comment/', {entity_id : commentid, liketype:'D'}, function(data){
-    //       $(lcc_id_name).html(data.likes);
-    //       $(dlcc_id_name).html(data.dislikes);
-    //     });
-    // });
+    $("#comments").on('click', '.like_comment', function () {
+        likeDislikePageComment(this,'comment', 'L');
+    });
+
+    $("#comments").on('click', '.dislike_comment', function() {
+        likeDislikePageComment(this,'comment', 'D');
+    });
 
     $("#comments").on('click', '.see-replies-btn',function(event) {
-    // $(".see_replies").on('click', function(event) {
-    // $(".see_replies").click( function(event) {
       var mcommentid = $(this).attr('data-mcommentid');
       toggleHideShowID("div_see_replies"+mcommentid);
       if ($("#div_see_replies"+mcommentid).html() === '') {
@@ -232,57 +207,15 @@ $(document).ready( function() {
       toggleHideShowID("form-post-comment-reply"+mcommentid);
     });
 
-
-
-    // $(".nested-comments").on('click', '.like_comment', function() {
-    //       var commentid = $(this).attr('data-commentid');
-    //       lcc_id_name = "#like_comment_count"+commentid;
-    //       dlcc_id_name = "#dislike_comment_count"+commentid;
-    //       $.post('/linkgroup/like_comment/', {entity_id : commentid, liketype:'L'}, function(data){
-    //         $(lcc_id_name).html(data.likes);
-    //         $(dlcc_id_name).html(data.dislikes);
-    //       });
-    // });
-    //
-    // $(".nested-comments").on('click', '.dislike_comment', function() {
-    //       var commentid = $(this).attr('data-commentid');
-    //       lcc_id_name = "#like_comment_count"+commentid;
-    //       dlcc_id_name = "#dislike_comment_count"+commentid;
-    //       $.post('/linkgroup/like_comment/', {entity_id : commentid, liketype:'D'}, function(data){
-    //         $(lcc_id_name).html(data.likes);
-    //         $(dlcc_id_name).html(data.dislikes);
-    //       });
-    // });
-
-    $("#comments").on('click', '.like_comment', function() {
-          var commentid = $(this).attr('data-commentid');
-          lcc_id_name = "#like_comment_count"+commentid;
-          dlcc_id_name = "#dislike_comment_count"+commentid;
-          $.post('/linkgroup/like_comment/', {entity_id : commentid, liketype:'L'}, function(data){
-            $(lcc_id_name).html(data.likes);
-            $(dlcc_id_name).html(data.dislikes);
-          });
-    });
-
-    $("#comments").on('click', '.dislike_comment', function() {
-          var commentid = $(this).attr('data-commentid');
-          lcc_id_name = "#like_comment_count"+commentid;
-          dlcc_id_name = "#dislike_comment_count"+commentid;
-          $.post('/linkgroup/like_comment/', {entity_id : commentid, liketype:'D'}, function(data){
-            $(lcc_id_name).html(data.likes);
-            $(dlcc_id_name).html(data.dislikes);
-          });
-    });
-
     $("#post-comment-form").on('submit', function(event) {
       event.preventDefault();
-      post_comment();
+      postComment();
     });
 
     $("#comments").on('click', '.comment-reply-btn', function(event) {
       event.preventDefault();
       console.log('nested comments is being posted.')
       var commentid = $(this).attr('data-commentid');
-      post_nested_comment(commentid);
+      postNestedComment(commentid);
     });
 });
