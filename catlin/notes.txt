@@ -1,0 +1,39 @@
+IMPROVEMENTS ON COMMENT
+1. When there will be many comments you will need load more comments option.
+  - load atleast five comment at each request
+  - show how many more comments are remaining, it can help you in keeping track
+    of the next comment to load, on the next load more request.
+2. Two comment forms:
+  - one for entering main comment, the form should be placed before any other
+    main comment.
+  - the second form will be displayed before any other nested comment.
+
+IMPROVEMENTS ON PAGES
+1. Add pagination.
+  - permit 10 pages per page, use ajax or new html for next 10.
+
+IMPROVEMENTS ON CATEGORY
+1. add sequence to pages in category on user command.
+
+FORM VIEWS
+1. Category
+  - Add category: title, add pages, summary, later: nested categories,
+      Back: user, lastmodified
+      AJAX: add pages -> add_page view
+  - Delete category: delete category object as well all pages in it
+  - Update category:
+      template has cat title, summary, all the pages, every thing is open in
+      text fields
+      pages have additional button to delete them -> delete_page view
+
+2. Page
+  - Add Page: take title, summary, url
+      Back: category, increase page_count of category by one.
+  - Delete Page: delete page, category's page_count decreases by one.
+  - Update Page: already in category
+
+3. Comment
+  - Add Comment: take content
+      Back: user, datemodified
+  - Delete Comment - delete it, as well as all other nested comments,
+  - edit comment - change content, update lastmodified

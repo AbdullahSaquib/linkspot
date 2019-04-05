@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<h2>{{category.title}}</h2>
+<form action="{% url 'catlin:delete_category' category.id %}" method="post">{% csrf_token %}
+  <input type="submit" name="delete_cat" value="Delete Category"/>
+</form>
+<h6>CREATED BY: {{category.user.user.username}} last modified on {{category.last_modified}}</h6>
+</h6>
+  <p> <strong>Summary: </strong> {{category.summary}}</p>
+<hr/>
+<form action="{% url 'catlin:add_page' category.id %}" method="post">{% csrf_token %}
+  <input type="submit" name="addpage" value="Add new page"/>
+</form>
+
+  {% if pages %}
+  <ul>
+  {% for page in pages %}
+  <li>
+    <form action="{% url 'catlin:goto_page' page.id %}" method="post">{% csrf_token %}
+      <p><input type="submit" name="goto_page" value="{{page.title}}"/>
+      Views: {{page.views}}</p>
+    </form>
+
+    <p>
+    <strong id="like_page_count{{page.id}}">Likes: {{ page.like_count }}</strong>
+    <strong id="dislike_page_count{{page.id}}">Dislikes: {{ page.dislike_count }}</strong>
+    </p>
+
+    <p><strong>Summary: </strong>{{page.summary}}</p>
+  </li>
+  {% endfor %}
+  </ul>
+  <hr/>
+  {% else %}
+  <strong>Currently, no pages in this category yet.</strong>
+  {% endif %}
+{% endblock %}

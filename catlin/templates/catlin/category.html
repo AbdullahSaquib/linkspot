@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% block body %}
+{% load static %}
+
+<!-- CATEGORY SECTION -->
+<h2>{{category.title}}</h2>
+<h6>CREATED BY: {{category.user.user.username}} last modified on {{category.last_modified}}</h6>
+<h6>
+  <strong id="like_counts">{{ category.like_count }}</strong>
+  <button id="likes" data-catid="{{category.id}}" type="button">
+  Like
+  </button>
+  <strong id="dislike_counts">{{ category.dislike_count }}</strong>
+  <button id="dislikes" data-catid="{{category.id}}" type="button">
+  Dislike
+  </button>
+</h6>
+<p>{{category.summary}}</p>
+
+<!-- PAGES SECTION -->
+{% if pages %}
+<ul>
+{% for page in pages %}
+<li>
+  <form action="{% url 'catlin:goto_page' page.id %}" method="post">{% csrf_token %}
+    <p><input type="submit" name="goto_page" value="{{page.title}}"/>
+    Views: {{page.views}}</p>
+  </form>
+
+  <p>
+  <strong id="like_page_count{{page.id}}">{{ page.like_count }}</strong>
+  <button class="like_page" id="like_page{{page.id}}" data-pageid="{{page.id}}" type="button">
+  Like
+  </button>
+  <strong id="dislike_page_count{{page.id}}">{{ page.dislike_count }}</strong>
+  <button class="dislike_page" id="dislike_page{{page.id}}" data-pageid="{{page.id}}" type="button">
+  Dislike
+  </button>
+  </p>
+
+  <p>{{page.summary}}</p>
+</li>
+{% endfor %}
+</ul>
+<hr>
+{% else %}
+<strong>No pages in this category yet.</strong>
+{% endif %}
+<!--COMMENT SECTION-->
+<h4>Comments</h4>
+<form action="" method="post" id="post-comment-form">{% csrf_token %}
+  {{main_comment_form.as_p}}
+  <input id='comment-btn' type="submit" name="PostComment" value="Post Comment" data-catid="{{category.id}}">
+</form>
+<div id="comments" data-catid="{{category.id}}">
+{% for comment in comments %}
+<div class="comment{{comment.id}}">
+<h5>{{comment.user.user.username}} {{comment.last_modified}}</h5>
+<p>{{comment.content}}</p>
+
+<p>
+<strong id="like_comment_count{{comment.id}}">{{ comment.like_count }}</strong>
+<button class="like_comment" id="like_comment{{comment.id}}" data-commentid="{{comment.id}}" type="button">
+Like
+</button>
+<strong id="dislike_comment_count{{comment.id}}">{{ comment.dislike_count }}</strong>
+<button class="dislike_comment" id="dislike_comment{{comment.id}}" data-commentid="{{comment.id}}" type="button">
+Dislike
+</button>
+</p>
+
+<!-- QUERIED NESTED COMMENTS -->
+
+<button class='see-comment-reply-btn' data-commentid='{{comment.id}}' type='button'>Reply</button>
+<button id='see-replies-btn{{comment.id}}' class='see-replies-btn' type="button" data-mcommentid={{comment.id}}>{{comment.comment_count}} Replies</button>
+
+<form action='' method='post' class='post-comment-reply' id='form-post-comment-reply{{comment.id}}' style="margin-left:30px; display:none;">{% csrf_token %}
+  <p>
+    <label for="new-comment{{comment.id}}">Content:</label>
+    <textarea name="content" cols="40" rows="10" placeholder="Post your thoughts" required="" id="new-comment{{comment.id}}"></textarea>
+  </p>
+  <input class='comment-reply-btn' type='submit' name='PostComment' value='Post' data-commentid='{{comment.id}}'>
+</form>
+
+<div class='nested-comments' id='div_see_replies{{comment.id}}' style="margin-left:30px; display:none;"></div>
+
+</div>
+<br/>
+{% endfor %}
+</div>
+{% endblock %}
