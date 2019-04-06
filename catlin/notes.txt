@@ -37,3 +37,13 @@ FORM VIEWS
       Back: user, datemodified
   - Delete Comment - delete it, as well as all other nested comments,
   - edit comment - change content, update lastmodified
+
+SEARCH VIEW
+
+
+  INDEX
+1. Logo, about us in short
+2. Search options
+3. Top 5 categories, expand categories list
+4. Top 5 pages
+5. Login, Logout

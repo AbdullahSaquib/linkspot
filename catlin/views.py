@@ -7,6 +7,7 @@ from catlin.models import (
 Category, Page, UserProfile, CategoryMap, Comment, LikePage, LikeComment, LikeCategory
 )
 from .forms import AddCategoryForm, AddPageForm, AddCommentForm
+from catlin.search.mysearch import compare_strings
 
 def like_my_model(my_request, entity_model, like_model):
     # like_model = LikePage, LikeComment, LikeCategory
@@ -59,6 +60,45 @@ def like_my_model(my_request, entity_model, like_model):
                 entity_obj.user.dislike_count = dislikes
                 entity_obj.user.save()
     return {'likes':likes, 'dislikes':dislikes}
+
+def get_search_categories(search_string, max_results = 5, threshold = 0):
+    search_result_cats = []
+    cat_score_list = []
+    cat_id_list = []
+    category_list = Category.objects.all()
+
+    #Filling cat_score_list, cat_id_list
+    for category in category_list:
+        cat_score_list.append(compare_strings(search_string, category.title))
+        cat_id_list.append(category.id)
+
+    #Collecting matched ids
+    for i in range(0, max_results):
+        max1 = max(cat_score_list)
+        if max1 > threshold:
+            index = cat_score_list.index(max1)
+            search_result_cats.append(category_list.get(id=cat_id_list[index]))
+            cat_score_list[index] = 0
+    return search_result_cats
+
+def get_search_pages(search_string, max_results = 5, threshold = 0):
+    search_result_pages = []
+    page_score_list = []
+    page_id_list = []
+    page_list = Page.objects.all()
+    #Filling page_score_list, page_id_list
+    for page in page_list:
+        page_score_list.append(compare_strings(search_string, page.title))
+        page_id_list.append(page.id)
+
+    #Collecting matched ids
+    for i in range(0, max_results):
+        max1 = max(page_score_list)
+        if max1 > threshold:
+            index = page_score_list.index(max1)
+            search_result_pages.append(page_list.get(id=page_id_list[index]))
+            page_score_list[index] = 0
+    return search_result_pages
 
 # Create your views here.
 def index(request):
@@ -209,7 +249,13 @@ def add_comment(request):
     return JsonResponse(context)
 
 def search(request):
-    return HttpResponse("Search feature coming soon.")
+    search_string = request.GET['search_string']
+    context = {
+        'search_result_cats':get_search_categories(search_string, threshold = 0.25),
+        'search_result_pages':get_search_pages(search_string, threshold = 0.25)
+    }
+    print(context)
+    return render(request, 'catlin/search.html', context)
 
 def search_category(request, category_id):
     return HttpResponse("Searching category feature coming soon.")
