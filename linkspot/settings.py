@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'catlin',
     'django_registration',
     'crispy_forms',
+    'users.apps.UsersConfig',
 ]
 
 MIDDLEWARE = [
@@ -134,3 +135,5 @@ STATICFILES_DIRS = (
 
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+LOGIN_REDIRECT_URL = 'catlin:index'
