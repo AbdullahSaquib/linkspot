@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block body %}
+{% block content %}
 <h2>{{category.title}}</h2>
 <form action="{% url 'catlin:delete_category' category.id %}" method="post">{% csrf_token %}
   <input type="submit" name="delete_cat" value="Delete Category"/>

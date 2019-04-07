@@ -1,14 +1,9 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Welcome to LinkSpot</title>
-</head>
-<body>
-  <h1>LinkSpot</h1>
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
   <form action="{% url 'catlin:search' %}" method="GET">
       <input type="text" name="search_string" value="" placeholder="Linkspot Search">
       <input type="submit" name="" value="Search">
   </form>
-
-</body>
-</html>
+{% endblock %}

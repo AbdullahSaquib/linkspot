@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block body %}
+{% block content %}
 
 <form action="{% url 'catlin:add_page' category_id %}" method="post">{% csrf_token %}
   {{form.as_p}}

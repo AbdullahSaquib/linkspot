@@ -6,8 +6,23 @@ from django.urls import reverse
 from catlin.models import (
 Category, Page, UserProfile, CategoryMap, Comment, LikePage, LikeComment, LikeCategory
 )
-from .forms import AddCategoryForm, AddPageForm, AddCommentForm
+from .forms import AddCategoryForm, AddPageForm, AddCommentForm, UserRegisterForm
 from catlin.search.mysearch import compare_strings
+from django.contrib import messages
+
+
+def register(request):
+    if request.method == "POST":
+        form = UserRegisterForm(request.POST)
+        print(request.POST)
+        if form.is_valid():
+            UserProfile(user=form.save()).save()
+            username = form.cleaned_data.get('username')
+            messages.success(request, 'Account created for '+username+'!')
+            return redirect('catlin:index')
+    else:
+        form = UserRegisterForm()
+    return render(request, 'catlin/register.html', {'form': form})
 
 def like_my_model(my_request, entity_model, like_model):
     # like_model = LikePage, LikeComment, LikeCategory
