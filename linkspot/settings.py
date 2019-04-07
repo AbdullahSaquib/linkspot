@@ -104,6 +104,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 MEDIA_ROOT = os.path.join(BASE_DIR,'media')
+MEDIA_URL = '/media/'
 
 # Django Registration
 ACCOUNT_ACTIVATION_DAYS = 7
@@ -137,3 +138,4 @@ STATICFILES_DIRS = (
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 LOGIN_REDIRECT_URL = 'catlin:index'
+LOGIN_URL = 'login'
