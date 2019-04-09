@@ -1,11 +1,16 @@
 {% extends 'base.html' %}
-
+{% load crispy_forms_tags %}
 {% block content %}
-
-<form action="{% url 'catlin:add_category' %}" method="post">{% csrf_token %}
-  {{form.as_p}}
-  <input type="submit" name="submit">
-</form>
-
-<p><strong>Note:</strong> To add pages in this category, please save the category.</p>
-{% endblock %}
+<div class="content-section">
+  <form action="{% url 'catlin:add_category' %}" method="post">{% csrf_token %}
+    <fieldset class="form-group">
+        <legend class="border-bottom mb-4">New Linkgroup</legend>
+        {{form|crispy}}
+    </fieldset>
+    <div class="form-group">
+      <input class="btn btn-outline-info" type="submit" value="Save">
+    </div>
+  </form>
+  <p class="text-danger"><strong>Note:</strong> To add pages, please save the linkgroup.</p>
+</div>
+{% endblock content%}

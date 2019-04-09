@@ -29,43 +29,43 @@ function toggleHideShowID(hs_id) {
 
 function nestedCommentsHtml(username, ncid, content, likes, dislikes) {
   var nchtml =
-  "<h5 class='nested-comment-heading'>"+ username +"</h5>" +
+  "<div class='article-metadata'>" +
+  "<a class='mr-2' href='#'>"+username+"</a></div>" +
   "<p class='nested-comment-content'>"+ content +"</p>" +
   "<strong class='nested-comment-likes' id='like_comment_count"+ncid+"'>"+ likes + "</strong>" +
-  " <button class='like_comment' id='like_comment"+ncid+"' data-commentid="+ncid+"  type='button'>" +
+  " <button class='btn btn-info btn-sm like_comment' id='like_comment"+ncid+"' data-commentid="+ncid+"  type='button'>" +
     "Like </button> " +
-  "<strong class='nested-comment-dislikes' id='dislike_comment_count"+ncid+"'>"+ dislikes + "</strong>" +
-  " <button class='dislike_comment' id='dislike_comment"+ncid+"' data-commentid="+ncid+"  type='button'>" +
+  "<strong class=' ml-2 nested-comment-dislikes' id='dislike_comment_count"+ncid+"'>"+ dislikes + "</strong>" +
+  " <button class='btn btn-secondary btn-sm dislike_comment' id='dislike_comment"+ncid+"' data-commentid="+ncid+"  type='button'>" +
     " Dislike</button>";
   return nchtml;
 }
 
 function mainCommentHtml(id, content, username, last_modified, like_count, dislike_count) {
   var mchtml = "<div class='comment"+id+"'>" +
-    "<h5>"+username+" Just Now</h5>"+
+    "<div class='article-metadata'>"+
+    "<a class='mr-2' href='#'>"+username+"</a>"+
+    "<small class='text-muted'>Just Now</small></div>"+
     "<p>"+content+"</p>"+
     "<p>"+
     "<strong id='like_comment_count"+id+"'>"+like_count+"</strong> "+
-    "<button class='like_comment' id='like_comment"+id+"' data-commentid='"+id+"' type='button'>"+
+    "<button class='btn btn-info btn-sm like_comment' id='like_comment"+id+"' data-commentid="+id+" type='button'>"+
     "Like"+
     "</button> "+
-    "<strong id='dislike_comment_count"+id+"'>"+dislike_count+"</strong> "+
-    "<button class='dislike_comment' id='dislike_comment"+id+"' data-commentid='"+id+"' type='button'>"+
+    "<strong class='ml-2' id='dislike_comment_count"+id+"'>"+dislike_count+"</strong> "+
+    "<button class='btn btn-secondary btn-sm dislike_comment' id='dislike_comment"+id+"' data-commentid='"+id+"' type='button'>"+
     "Dislike"+
     "</button>"+
     "</p>"+
     "<!-- QUERIED NESTED COMMENTS -->"+
-    "<button class='see-comment-reply-btn' data-commentid='"+id+"' type='button'>Reply</button>"+
-    "<button id='see-replies-btn"+id+"' class='see-replies-btn' type='button' data-mcommentid="+id+">0 Replies</button>"+
-    "<form action='' method='post' class='post-comment-reply' id='form-post-comment-reply"+id+"' style='margin-left:30px; display:none;'>"+
-    "<p>"+
-        "<label for='new-comment"+id+"'>Content:</label>"+
-        "<textarea name='content' cols='40' rows='10' placeholder='Post your thoughts' required='' id='new-comment"+id+"'></textarea>"+
-        "</p>"+
-      "<input class='comment-reply-btn' type='submit' name='PostComment' value='Post' data-commentid='"+id+"'>"+
-    "</form>"+
+    "<a class='text-primary see-comment-reply-btn' data-commentid='"+id+"' type='button'>Reply</a>"+
+    "<a id='see-replies-btn"+id+"' class='text-primary ml-4 see-replies-btn' type='button' data-mcommentid="+id+">0 Replies</a>"+
+    "<div class='post-comment-reply' id='form-post-comment-reply"+id+"' style='margin-left:30px; display:none;'>"+
+        "<textarea name='content' placeholder='Post your thoughts' id='new-comment"+id+"' style='width:100%'></textarea>"+
+        "<input class='btn btn-outline-info btn-sm comment-reply-btn' type='submit' name='PostComment' value='Post' data-commentid='"+id+"'>"+
+    "</div>"+
     "<div class='nested-comments' id='div_see_replies"+id+"' style='margin-left:30px; display:none;'></div>"+
-    "</div>";
+    "</div><br/>";
   return mchtml;
 }
 

@@ -1,38 +1,34 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2>{{category.title}}</h2>
-<form action="{% url 'catlin:delete_category' category.id %}" method="post">{% csrf_token %}
-  <input type="submit" name="delete_cat" value="Delete Category"/>
-</form>
-<h6>CREATED BY: {{category.user.user.username}} last modified on {{category.last_modified}}</h6>
-</h6>
-  <p> <strong>Summary: </strong> {{category.summary}}</p>
-<hr/>
-<form action="{% url 'catlin:add_page' category.id %}" method="post">{% csrf_token %}
-  <input type="submit" name="addpage" value="Add new page"/>
-</form>
+<div class="content-section">
+<a class="btn btn-outline-info btn-sm mb-4" href="{% url 'catlin:add_page' category.id %}">Add new page</a>
+<a class="btn btn-outline-danger btn-sm mb-4" href="{% url 'catlin:delete_category' category.id %}">Delete This Linkgroup</a>
 
+<article class="media content-section">
+  <div class="media-body">
+    <div class="article-metadata">
+      <a class="mr-2" href="#">{{category.user.user.username}}</a>
+      <small class="text-muted">{{category.last_modified|date:"D d, Y"}}</small>
+    </div>
+    <h2 class="article-title">{{category.title}}</h2>
+    <p class="article-content">{{category.summary}}</p>
+  </div>
+</article>
+
+<h3 class="border-bottom">Pages</h3>
   {% if pages %}
-  <ul>
   {% for page in pages %}
-  <li>
-    <form action="{% url 'catlin:goto_page' page.id %}" method="post">{% csrf_token %}
-      <p><input type="submit" name="goto_page" value="{{page.title}}"/>
-      Views: {{page.views}}</p>
-    </form>
-
-    <p>
-    <strong id="like_page_count{{page.id}}">Likes: {{ page.like_count }}</strong>
-    <strong id="dislike_page_count{{page.id}}">Dislikes: {{ page.dislike_count }}</strong>
-    </p>
-
-    <p><strong>Summary: </strong>{{page.summary}}</p>
-  </li>
+    <a href="{% url 'catlin:goto_page' page.id %}">{{page.title}}</a> <span>({{page.views}} view{{page.views|pluralize}})</span>
+    <p class="text-secondary">
+    <strong id="like_page_count{{page.id}}">Likes:</strong> {{ page.like_count }}
+    <strong id="dislike_page_count{{page.id}}">Dislikes:</strong> {{ page.dislike_count }}
+  </p><p>
+    <strong class="text-body">Summary: </strong>{{page.summary}}</p>
   {% endfor %}
-  </ul>
-  <hr/>
   {% else %}
   <strong>Currently, no pages in this category yet.</strong>
   {% endif %}
+
+</div>
 {% endblock %}

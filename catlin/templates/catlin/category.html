@@ -1,91 +1,97 @@
 {% extends 'base.html' %}
+{% load crispy_forms_tags %}
 {% block content %}
-{% load static %}
 
 <!-- CATEGORY SECTION -->
-<h2>{{category.title}}</h2>
-<h6>CREATED BY: {{category.user.user.username}} last modified on {{category.last_modified}}</h6>
-<h6>
-  <strong id="like_counts">{{ category.like_count }}</strong>
-  <button id="likes" data-catid="{{category.id}}" type="button">
-  Like
-  </button>
-  <strong id="dislike_counts">{{ category.dislike_count }}</strong>
-  <button id="dislikes" data-catid="{{category.id}}" type="button">
-  Dislike
-  </button>
-</h6>
-<p>{{category.summary}}</p>
+<div class="content-section">
+<article class="media content-section">
+  <img class="rounded-circle article-img" src="{{category.user.image.url}}"/>
+  <div class="media-body">
+    <div class="article-metadata">
+      <a class="mr-2" href="#">{{category.user.user.username}}</a>
+      <small class="text-muted">{{category.last_modified|date:"D d, Y"}}</small>
+    </div>
+    <h2 class="article-title">{{category.title}}</h2>
+    <p class="article-content">{{category.summary}}</p>
+    <strong id="like_counts">{{ category.like_count }}</strong>
+    <button class="btn btn-info btn-sm" id="likes" data-catid="{{category.id}}" type="button">
+    Like
+    </button>
+    <strong id="dislike_counts">{{ category.dislike_count }}</strong>
+    <button class="btn btn-secondary btn-sm" id="dislikes" data-catid="{{category.id}}" type="button">
+    Dislike
+    </button>
+
+  </div>
+</article>
 
 <!-- PAGES SECTION -->
+<h3 class="border-bottom pb-2">Pages <small>({{category.page_count}})</small></h3>
 {% if pages %}
-<ul>
 {% for page in pages %}
-<li>
-  <form action="{% url 'catlin:goto_page' page.id %}" method="post">{% csrf_token %}
-    <p><input type="submit" name="goto_page" value="{{page.title}}"/>
-    Views: {{page.views}}</p>
-  </form>
-
-  <p>
+<p class="float-right">
   <strong id="like_page_count{{page.id}}">{{ page.like_count }}</strong>
-  <button class="like_page" id="like_page{{page.id}}" data-pageid="{{page.id}}" type="button">
+  <button class="btn btn-info btn-sm like_page" id="like_page{{page.id}}" data-pageid="{{page.id}}" type="button">
   Like
   </button>
   <strong id="dislike_page_count{{page.id}}">{{ page.dislike_count }}</strong>
-  <button class="dislike_page" id="dislike_page{{page.id}}" data-pageid="{{page.id}}" type="button">
+  <button class="btn btn-secondary btn-sm dislike_page" id="dislike_page{{page.id}}" data-pageid="{{page.id}}" type="button">
   Dislike
   </button>
-  </p>
-
-  <p>{{page.summary}}</p>
-</li>
+</p>
+<a href="{% url 'catlin:goto_page' page.id %}">{{page.title}}</a> <span>({{page.views}} view{{page.views|pluralize}})</span>
+ <p class="pt-2 pb-4">{{page.summary}}</p>
 {% endfor %}
-</ul>
-<hr>
 {% else %}
 <strong>No pages in this category yet.</strong>
 {% endif %}
+</div>
+
 <!--COMMENT SECTION-->
-<h4>Comments</h4>
+<div class="content-section">
+  <h3 class="border-bottom pb-2">Comments <small>({{category.comment_count}})</small></h3>
 <form action="" method="post" id="post-comment-form">{% csrf_token %}
-  {{main_comment_form.as_p}}
-  <input id='comment-btn' type="submit" name="PostComment" value="Post Comment" data-catid="{{category.id}}">
+  <fieldset class="form-group">
+      {{main_comment_form|crispy}}
+  </fieldset>
+  <div class="form-group">
+    <input class="btn btn-outline-info btn-sm" id='comment-btn' type="submit" name="PostComment" value="Post Comment" data-catid="{{category.id}}">
+  </div>
 </form>
+
 <div id="comments" data-catid="{{category.id}}">
 {% for comment in comments %}
 <div class="comment{{comment.id}}">
-<h5>{{comment.user.user.username}} {{comment.last_modified}}</h5>
+  <div class="article-metadata">
+    <a class="mr-2" href="#">{{comment.user.user.username}}</a>
+    <small class="text-muted">{{comment.last_modified|date:"D d, Y"}}</small>
+</div>
 <p>{{comment.content}}</p>
 
 <p>
 <strong id="like_comment_count{{comment.id}}">{{ comment.like_count }}</strong>
-<button class="like_comment" id="like_comment{{comment.id}}" data-commentid="{{comment.id}}" type="button">
+<button class="btn btn-info btn-sm like_comment" id="like_comment{{comment.id}}" data-commentid="{{comment.id}}" type="button">
 Like
 </button>
-<strong id="dislike_comment_count{{comment.id}}">{{ comment.dislike_count }}</strong>
-<button class="dislike_comment" id="dislike_comment{{comment.id}}" data-commentid="{{comment.id}}" type="button">
+<strong class="ml-2" id="dislike_comment_count{{comment.id}}">{{ comment.dislike_count }}</strong>
+<button class="btn btn-secondary btn-sm dislike_comment" id="dislike_comment{{comment.id}}" data-commentid="{{comment.id}}" type="button">
 Dislike
 </button>
 </p>
 
 <!-- QUERIED NESTED COMMENTS -->
-
-<button class='see-comment-reply-btn' data-commentid='{{comment.id}}' type='button'>Reply</button>
-<button id='see-replies-btn{{comment.id}}' class='see-replies-btn' type="button" data-mcommentid={{comment.id}}>{{comment.comment_count}} Replies</button>
-
-<form action='' method='post' class='post-comment-reply' id='form-post-comment-reply{{comment.id}}' style="margin-left:30px; display:none;">{% csrf_token %}
-  <p>
-    <label for="new-comment{{comment.id}}">Content:</label>
-    <textarea name="content" cols="40" rows="10" placeholder="Post your thoughts" required="" id="new-comment{{comment.id}}"></textarea>
-  </p>
-  <input class='comment-reply-btn' type='submit' name='PostComment' value='Post' data-commentid='{{comment.id}}'>
-</form>
-
+<a class='text-primary see-comment-reply-btn' type="button" data-commentid='{{comment.id}}'>Reply</a>
+<a id='see-replies-btn{{comment.id}}' class='text-primary ml-4 see-replies-btn' type="button" data-mcommentid={{comment.id}}>{{comment.comment_count}} Replies</a>
+<div class='post-comment-reply' id='form-post-comment-reply{{comment.id}}' style="margin-left:30px; display:none;">
+    <textarea name="content" placeholder="Post your thoughts" id="new-comment{{comment.id}}" style="width:100%"></textarea>
+    <input class='btn btn-outline-info btn-sm comment-reply-btn' type='submit' name='PostComment' value='Post' data-commentid='{{comment.id}}'>
+</div>
 <div class='nested-comments' id='div_see_replies{{comment.id}}' style="margin-left:30px; display:none;"></div>
 
 </div>
 <br/>
 {% endfor %}
+</div>
+
 </div>
 {% endblock %}

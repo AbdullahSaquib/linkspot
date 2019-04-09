@@ -11,6 +11,7 @@ class AddPageForm(forms.Form):
 
 class AddCommentForm(forms.Form):
     content = forms.CharField(
+        label = '',
         widget=forms.Textarea(attrs = {
             'id':'new-comment',
             'placeholder':'Post your thoughts'

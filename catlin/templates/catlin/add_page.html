@@ -1,10 +1,17 @@
 {% extends 'base.html' %}
-
+{% load crispy_forms_tags %}
 {% block content %}
 
-<form action="{% url 'catlin:add_page' category_id %}" method="post">{% csrf_token %}
-  {{form.as_p}}
-  <input type="submit" name="submit" value="Add Page">
-</form>
+<div class="content-section">
+  <form action="{% url 'catlin:add_page' category_id %}" method="post">{% csrf_token %}
+    <fieldset class="form-group">
+        <legend class="border-bottom mb-4">New Page</legend>
+        {{form|crispy}}
+    </fieldset>
+    <div class="form-group">
+      <input class="btn btn-outline-info" type="submit" value="Save">
+    </div>
+  </form>
+</div>
 
 {% endblock %}

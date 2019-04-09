@@ -1,20 +1,22 @@
 import json
 from django.shortcuts import render, get_object_or_404, get_list_or_404, redirect
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
-from django.views import generic
 from django.urls import reverse
 from catlin.models import (
-Category, Page, UserProfile, CategoryMap, Comment, LikePage, LikeComment, LikeCategory
+Category, Page, CategoryMap, Comment, LikePage, LikeComment, LikeCategory
 )
+from users.models import Profile
 from .forms import AddCategoryForm, AddPageForm, AddCommentForm
 from catlin.search.mysearch import compare_strings
 
 
 def like_my_model(my_request, entity_model, like_model):
-    # like_model = LikePage, LikeComment, LikeCategory
-    # entity_model = Page, Comment, Category
-    # AJAX post request must contain: entity_id, liketype('L' or 'D')
-    # returns dict {likes, dislikes}
+    """
+    like_model = LikePage, LikeComment, LikeCategory
+    entity_model = Page, Comment, Category
+    AJAX post request must contain: entity_id, liketype('L' or 'D')
+    returns dict {likes, dislikes}
+    """
     entity_id = None
     like_type = None
     not_like_type = 'D'
@@ -22,7 +24,7 @@ def like_my_model(my_request, entity_model, like_model):
     not_like_type_count = 0
     likes = 0
     dislikes = 0
-    user = UserProfile.objects.get(user=my_request.user)
+    user = Profile.objects.get(user=my_request.user)
     if my_request.method == "POST":
         entity_id = my_request.POST['entity_id']
         like_type = my_request.POST['liketype']
@@ -56,7 +58,7 @@ def like_my_model(my_request, entity_model, like_model):
             entity_obj.like_count = likes
             entity_obj.dislike_count = dislikes
             entity_obj.save()
-            if entity_model == Category:
+            if entity_model == Category and entity_obj.user:
                 entity_obj.user.like_count = likes
                 entity_obj.user.dislike_count = dislikes
                 entity_obj.user.save()
@@ -103,7 +105,8 @@ def get_search_pages(search_string, max_results = 5, threshold = 0):
 
 # Create your views here.
 def index(request):
-    return render(request, 'catlin/index.html', {})
+    categories = Category.objects.all()
+    return render(request, 'catlin/index.html', {'categories':categories})
 
 def category(request, category_id):
     comment_index = 0 #some request object
@@ -130,7 +133,7 @@ def add_category(request):
     if request.method == 'POST':
         form = AddCategoryForm(request.POST)
         if form.is_valid():
-            user = UserProfile.objects.get(user=request.user)
+            user = Profile.objects.get(user=request.user)
             cat = Category(
                 title = form.cleaned_data['title'],
                 summary = form.cleaned_data['summary'],
@@ -205,7 +208,7 @@ def add_comment(request):
     if request.method == 'POST':
         type = 'M'
         parent_comment = None
-        user = UserProfile.objects.get(user=request.user)
+        user = Profile.objects.get(user=request.user)
         comment_content = request.POST['comment_content']
         category_id = request.POST['category_id']
         try:

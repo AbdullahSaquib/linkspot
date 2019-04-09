@@ -1,9 +1,8 @@
 from django.contrib import admin
 from .models import (
-UserProfile, Category, Page, CategoryMap, Comment, LikeCategory, LikeComment, LikePage
+Category, Page, CategoryMap, Comment, LikeCategory, LikeComment, LikePage
 )
 # Register your models here.
-admin.site.register(UserProfile)
 admin.site.register(Category)
 admin.site.register(Page)
 admin.site.register(CategoryMap)

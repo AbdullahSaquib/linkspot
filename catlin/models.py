@@ -1,24 +1,16 @@
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
+from users.models import Profile
 
 # Create your models here.
 like_types = (('L','Like'),('D','Dislike')) #for removing like after liking delete the row
 comment_types = (('M', 'Main Comment'), ('N','Nested Comment'))
 
-class UserProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    image = models.ImageField(upload_to='profile_pictures', blank=True)
-    category_count = models.PositiveIntegerField(default=0)
-    like_count = models.PositiveIntegerField(default=0)
-    dislike_count = models.PositiveIntegerField(default=0)
-    def __str__(self):
-        return self.user.username
-
 class Category(models.Model):
     title = models.CharField(max_length=100)
     summary = models.CharField(max_length=500)
-    user = models.ForeignKey(UserProfile, null=True, on_delete=models.SET_NULL)
+    user = models.ForeignKey(Profile, null=True, on_delete=models.SET_NULL)
     last_modified = models.DateTimeField(auto_now_add = True)
     views = models.PositiveIntegerField(default=0)
     category_count = models.PositiveIntegerField(default=0)
@@ -72,7 +64,7 @@ class CategoryMap(models.Model):
 class Comment(models.Model):
     content = models.TextField()
     last_modified = models.DateTimeField(auto_now=True)
-    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    user = models.ForeignKey(Profile, on_delete=models.CASCADE)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     like_count = models.PositiveIntegerField(default=0)
     dislike_count = models.PositiveIntegerField(default=0)
@@ -87,7 +79,7 @@ class Comment(models.Model):
         ]
 
 class LikeCategory(models.Model):
-    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    user = models.ForeignKey(Profile, on_delete=models.CASCADE)
     entity = models.ForeignKey(Category, on_delete=models.CASCADE)
     type = models.CharField(max_length=1, choices=like_types)
     def __str__(self):
@@ -101,7 +93,7 @@ class LikeCategory(models.Model):
         ]
 
 class LikeComment(models.Model):
-    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    user = models.ForeignKey(Profile, on_delete=models.CASCADE)
     entity = models.ForeignKey(Comment, on_delete=models.CASCADE)
     type = models.CharField(max_length=1, choices=like_types)
     def __str__(self):
@@ -113,7 +105,7 @@ class LikeComment(models.Model):
         ]
 
 class LikePage(models.Model):
-    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    user = models.ForeignKey(Profile, on_delete=models.CASCADE)
     entity = models.ForeignKey(Page, on_delete=models.CASCADE)
     type = models.CharField(max_length=1, choices=like_types)
     def __str__(self):
