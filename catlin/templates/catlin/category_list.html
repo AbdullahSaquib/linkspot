@@ -6,7 +6,7 @@
         <input class="col-md-9" type="text" name="search_string" value="" placeholder="Linkspot Search">
         <input class="btn btn-outline-info" type="submit" value="Search">
     </form>
-    
+
     <h2 class="border-bottom mb-4">{{heading}}</h2>
     {% if type == 'category search' %}
       <form action="{% url 'catlin:search_pages' %}" method="GET">
@@ -33,19 +33,19 @@
 
       <div class="btn-group">
           {% if categories.has_previous %}
-            <a class="btn btn-outline-info mb-4" href="?search_string={{heading}}&page=1">First</a>
-            <a class="btn btn-outline-info mb-4" href="?search_string={{heading}}&page={{categories.previous_page_number}}">Previous</a>
+            <a class="btn btn-outline-info mb-4" href="?page=1">First</a>
+            <a class="btn btn-outline-info mb-4" href="?page={{categories.previous_page_number}}">Previous</a>
           {% endif %}
           {% for num in categories.paginator.page_range %}
             {% if categories.number == num %}
-              <a class="btn btn-info mb-4" href="?search_string={{heading}}&page={{num}}">{{num}}</a>
+              <a class="btn btn-info mb-4" href="?page={{num}}">{{num}}</a>
             {% elif num > categories.number|add:'-3' and num < categories.number|add:'3' %}
-              <a class="btn btn-outline-info mb-4" href="?search_string={{heading}}&page={{num}}">{{num}}</a>
+              <a class="btn btn-outline-info mb-4" href="?page={{num}}">{{num}}</a>
             {% endif %}
           {% endfor %}
           {% if categories.has_next %}
-            <a class="btn btn-outline-info mb-4" href="?search_string={{heading}}&page={{categories.next_page_number}}">Next</a>
-            <a class="btn btn-outline-info mb-4" href="?search_string={{heading}}&page={{categories.paginator.num_pages}}">Last</a>
+            <a class="btn btn-outline-info mb-4" href="?page={{categories.next_page_number}}">Next</a>
+            <a class="btn btn-outline-info mb-4" href="?page={{categories.paginator.num_pages}}">Last</a>
           {% endif %}
       </div>
 

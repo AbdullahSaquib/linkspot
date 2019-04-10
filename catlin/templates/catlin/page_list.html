@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="content-section">
+
+    <form class="mb-4" action="{% url 'catlin:search' %}" method="GET">
+        <input class="col-md-9" type="text" name="search_string" value="" placeholder="Linkspot Search">
+        <input class="btn btn-outline-info" type="submit" value="Search">
+    </form>
+
+    <h2 class="border-bottom mb-4">{{heading}}</h2>
+    {% if type == 'page search' %}
+      <form action="{% url 'catlin:search' %}" method="GET">
+        <input type="hidden" name="search_string" value="{{heading}}">
+        <button class="btn btn-link" type='submit'>Search linkgroups for <strong>'{{heading}}'</strong></button>
+      </form>
+    {% endif %}
+
+    {% if pages %}
+      {% for page in pages %}
+        <a href="{% url 'catlin:goto_page' page.id %}">{{page.title}}</a><span> ({{page.views}} view{{page.views|pluralize}})</span>
+        <p>{{page.summary}}</p>
+        <p><strong>Linkgroup: </strong><a href="{% url 'catlin:category' page.category.id %}">{{page.category.title}}</a></p>
+      {% endfor %}
+
+      <div class="btn-group">
+          {% if pages.has_previous %}
+            <a class="btn btn-outline-info mb-4" href="?search_string={{heading}}&page=1">First</a>
+            <a class="btn btn-outline-info mb-4" href="?search_string={{heading}}&page={{pages.previous_page_number}}">Previous</a>
+          {% endif %}
+          {% for num in pages.paginator.page_range %}
+            {% if pages.number == num %}
+              <a class="btn btn-info mb-4" href="?search_string={{heading}}&page={{num}}">{{num}}</a>
+            {% elif num > pages.number|add:'-3' and num < pages.number|add:'3' %}
+              <a class="btn btn-outline-info mb-4" href="?search_string={{heading}}&page={{num}}">{{num}}</a>
+            {% endif %}
+          {% endfor %}
+          {% if pages.has_next %}
+            <a class="btn btn-outline-info mb-4" href="?search_string={{heading}}&page={{pages.next_page_number}}">Next</a>
+            <a class="btn btn-outline-info mb-4" href="?search_string={{heading}}&page={{pages.paginator.num_pages}}">Last</a>
+          {% endif %}
+      </div>
+
+    {% else %}
+      <p><strong>No links matched your query.</strong></p>
+    {% endif %}
+
+</div>
+
+
+{% endblock %}

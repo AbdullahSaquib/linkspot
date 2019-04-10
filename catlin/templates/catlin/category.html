@@ -11,7 +11,7 @@
   <img class="rounded-circle article-img" src="{{category.user.image.url}}"/>
   <div class="media-body">
     <div class="article-metadata">
-      <a class="mr-2" href="#">{{category.user.user.username}}</a>
+      <a class="mr-2" href="{% url 'catlin:users_categories' category.user.user.username %}">{{category.user.user.username}}</a>
       <small class="text-muted">{{category.last_modified|date:"D d, Y"}}</small>
     </div>
     <h2 class="article-title">{{category.title}}</h2>

@@ -4,6 +4,7 @@ from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
+from django.core.paginator import Paginator
 from catlin.models import (
 Category, Page, CategoryMap, Comment, LikePage, LikeComment, LikeCategory
 )
@@ -107,16 +108,30 @@ def get_search_pages(search_string, max_results = 5, threshold = 0):
 
 # Create your views here.
 def index(request):
-    categories = Category.objects.all()
-    return render(request, 'catlin/index.html', {'categories':categories})
+    category_list = Category.objects.all()
+    paginator = Paginator(category_list, 5)
+    page_no = request.GET.get('page')
+    categories = paginator.get_page(page_no)
+    context = {
+        'categories':categories,
+        'heading':'All Linkgroups'
+    }
+    return render(request, 'catlin/category_list.html', context)
 
 def users_categories(request, username):
     try:
         author = Profile.objects.get(user__username = username)
     except Profile.DoesNotExist:
         return render(request, 'catlin/not_exist.html', {'type':'user'})
-    categories = Category.objects.filter(user=author)
-    return render(request, 'catlin/index.html', {'categories':categories})
+    category_list = Category.objects.filter(user=author)
+    paginator = Paginator(category_list, 5)
+    page_no = request.GET.get('page')
+    categories = paginator.get_page(page_no)
+    context = {
+        'categories':categories,
+        'heading': 'Linkgroups of '+ username,
+    }
+    return render(request, 'catlin/category_list.html', context)
 
 def category(request, category_id):
     comment_index = 0 #some request object
@@ -306,13 +321,30 @@ def add_comment(request):
         return render(request, 'catlin/not_authorised.html',{})
     return JsonResponse(context)
 
+def search_pages(request):
+    search_string = request.GET['search_string']
+    page_list = get_search_pages(search_string, max_results=10, threshold = 0.25)
+    paginator = Paginator(page_list, 5)
+    page_no = request.GET.get('page')
+    pages = paginator.get_page(page_no)
+    context = {
+        'pages':pages,
+        'heading':search_string,
+        'type':'page search',
+    }
+    return render(request, 'catlin/page_list.html', context)
+
 def search(request):
     search_string = request.GET['search_string']
+    category_list = get_search_categories(search_string, max_results=10, threshold = 0.25)
+    paginator = Paginator(category_list, 5)
+    page_no = request.GET.get('page')
+    categories = paginator.get_page(page_no)
     context = {
-        'search_result_cats':get_search_categories(search_string, threshold = 0.25),
-        'search_result_pages':get_search_pages(search_string, threshold = 0.25)
+        'categories': categories,
+        'heading':search_string,
+        'type':'category search',
     }
-    print(context)
     return render(request, 'catlin/search.html', context)
 
 def search_category(request, category_id):

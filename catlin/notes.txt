@@ -47,3 +47,9 @@ SEARCH VIEW
 3. Top 5 categories, expand categories list
 4. Top 5 pages
 5. Login, Logout
+
+NEW Functionality
+1. Add custom filter for identifying whether GET data is attached, if it is
+  then return & else return ?
+  This will help me in using single template for both all categories, users_categories
+  and category search.
