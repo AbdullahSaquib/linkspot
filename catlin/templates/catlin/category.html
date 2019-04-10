@@ -4,6 +4,9 @@
 
 <!-- CATEGORY SECTION -->
 <div class="content-section">
+  {% if request.user == category.user.user %}
+  <a class="btn btn-outline-warning btn-sm mb-4" href="{% url 'catlin:update_category' category.id %}">Update</a>
+  {% endif %}
 <article class="media content-section">
   <img class="rounded-circle article-img" src="{{category.user.image.url}}"/>
   <div class="media-body">
@@ -26,7 +29,7 @@
 </article>
 
 <!-- PAGES SECTION -->
-<h3 class="border-bottom pb-2">Pages <small>({{category.page_count}})</small></h3>
+<h3 class="border-bottom pb-2">Links <small>({{category.page_count}})</small></h3>
 {% if pages %}
 {% for page in pages %}
 <p class="float-right">

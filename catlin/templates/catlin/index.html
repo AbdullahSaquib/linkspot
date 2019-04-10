@@ -16,8 +16,9 @@
           <div class="article-metadata">
             <a class="mr-2" href="#">{{category.user.user.username}}</a>
             <small class="text-muted">{{category.last_modified|date:"D d, Y"}}</small>
+            <small class="text-muted float-right">{{category.page_count}} link{{category.page_count|pluralize}}</small>
           </div>
-          <h2 class="article-title">{{category.title}}</h2>
+          <h2><a href="{% url 'catlin:category' category.id %}" class="article-title">{{category.title}}</a></h2>
           <p class="article-content">{{category.summary}}</p>
         </div>
       </article>

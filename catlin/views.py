@@ -1,6 +1,8 @@
 import json
 from django.shortcuts import render, get_object_or_404, get_list_or_404, redirect
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from catlin.models import (
 Category, Page, CategoryMap, Comment, LikePage, LikeComment, LikeCategory
@@ -128,7 +130,7 @@ def category(request, category_id):
     }
     return render(request, 'catlin/category.html', context)
 
-# @login_required
+@login_required
 def add_category(request):
     if request.method == 'POST':
         form = AddCategoryForm(request.POST)
@@ -150,6 +152,7 @@ def add_category(request):
     }
     return render(request,'catlin/add_category.html', context)
 
+@login_required
 def add_page(request, category_id):
     try:
         category = Category.objects.get(id=category_id)
@@ -166,6 +169,8 @@ def add_page(request, category_id):
                 category = category
                 )
             page.save()
+            category.page_count += 1
+            category.save()
             return HttpResponseRedirect(reverse('catlin:update_category', args=[category_id]))
     elif request.user != category.user.user:
         return render(request, 'catlin/not_authorised.html',{})
@@ -176,6 +181,34 @@ def add_page(request, category_id):
     }
     return render(request, 'catlin/add_page.html', context)
 
+@login_required
+def delete_page(request, page_id):
+    try:
+        page = Page.objects.get(id=page_id)
+    except Page.DoesNotExist:
+        return render(request, 'catlin/page_not_exist.html', {})
+    user = page.category.user
+    if user.user == request.user:
+        return render(request, 'catlin/verify_page_delete.html', {'page':page})
+    return render(request, 'catlin/not_authorised.html',{})
+
+@login_required
+def delete_page_verify(request, page_id):
+    try:
+        page = Page.objects.get(id=page_id)
+    except Page.DoesNotExist:
+        return render(request, 'catlin/page_not_exist.html', {})
+    category = page.category
+    user = category.user
+    if user.user == request.user and request.method=='POST':
+        page.delete()
+        category.page_count -= 1
+        category.save()
+        messages.success(request, "The link was deleted successfully.")
+        return redirect('catlin:update_category', category_id=category.id)
+    return render(request, 'catlin/not_authorised.html',{})
+
+@login_required
 def update_category(request, category_id):
     try:
         category = Category.objects.get(id=category_id)
@@ -190,20 +223,39 @@ def update_category(request, category_id):
         return render(request,'catlin/update_category.html', context)
     return render(request, 'catlin/not_authorised.html',{})
 
+@login_required
 def delete_category(request, category_id):
     try:
         category = Category.objects.get(id=category_id)
     except Category.DoesNotExist:
         return render(request, 'catlin/cat_not_exist.html', {})
     user = category.user
-    if request.method == 'POST' and user.user == request.user:
+    if user.user == request.user:
+        return render(request, 'catlin/verify_category_delete.html', {'page':category})
+    return render(request, 'catlin/not_authorised.html',{})
+    # if request.method == 'POST' and user.user == request.user:
+    #     category.delete()
+    #     user.category_count -= 1
+    #     user.save()
+    #     return HttpResponseRedirect(reverse('catlin:del_cat_successfull'))
+    # return render(request, 'catlin/not_authorised.html',{})
+
+@login_required
+def delete_category_verified(request, category_id):
+    try:
+        category = Category.objects.get(id=category_id)
+    except Category.DoesNotExist:
+        return render(request, 'catlin/cat_not_exist.html', {})
+    user = category.user
+    if user.user == request.user and request.method=='POST':
         category.delete()
         user.category_count -= 1
         user.save()
-        return HttpResponseRedirect(reverse('catlin:del_cat_successfull'))
+        messages.success(request, "The linkgroup was deleted successfully.")
+        return redirect('catlin:index')
     return render(request, 'catlin/not_authorised.html',{})
 
-# @login_required
+@login_required
 def add_comment(request):
     if request.method == 'POST':
         type = 'M'
@@ -264,7 +316,7 @@ def search(request):
 def search_category(request, category_id):
     return HttpResponse("Searching category feature coming soon.")
 
-# @login_required
+@login_required
 def like_category(request):
     #add like_category object (test)
     #increment category like_count (test)
@@ -273,10 +325,12 @@ def like_category(request):
     json_context = like_my_model(my_request=request, entity_model=Category, like_model=LikeCategory)
     return JsonResponse(json_context)
 
+@login_required
 def like_page(request):
     json_context = like_my_model(my_request=request, entity_model=Page, like_model=LikePage)
     return JsonResponse(json_context)
 
+@login_required
 def like_comment(request):
     json_context = like_my_model(my_request=request, entity_model=Comment, like_model=LikeComment)
     return JsonResponse(json_context)
@@ -317,5 +371,6 @@ def see_replies(request):
     }
     return JsonResponse(json_context1)
 
+@login_required
 def del_cat_successfull(request):
     return render(request, 'catlin/del_cat_success.html',{})

@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="content-section">
+  <form action="{% url 'catlin:delete_category_verified' category.id %}" method="post">{% csrf_token %}
+    <fieldset class="form-group">
+        <legend class="border-bottom mb-4">Delete Linkgroup</legend>
+        <h2>Are you sure you want to delete the linkgroup "{{category.title}}"?
+          It has {{category.page_count}} link{{category.page_count|pluralize}}</h2>
+          <button type="submit" class="btn btn-outline-danger btn-sm mb-4" href="{% url 'catlin:delete_category_verified' category.id %}">Delete</button>
+          <a href="{% url 'catlin:category' category.id %}" class="btn btn-outline-secondary btn-sm mb-4" name="button">Cancel</a>
+    </fieldset>
+  </form>
+</div>
+{% endblock content%}
