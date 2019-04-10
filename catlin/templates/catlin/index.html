@@ -1,12 +1,10 @@
 {% extends 'base.html' %}
-{% load static %}
-
 {% block content %}
 <div class="content-section">
 
     <form class="mb-4" action="{% url 'catlin:search' %}" method="GET">
         <input class="col-md-9" type="text" name="search_string" value="" placeholder="Linkspot Search">
-        <input class="btn btn-outline-info" type="submit" name="" value="Search">
+        <input class="btn btn-outline-info" type="submit" value="Search">
     </form>
 
     {% for category in categories %}
@@ -14,7 +12,7 @@
         <img class="rounded-circle article-img" src="{{category.user.image.url}}"/>
         <div class="media-body">
           <div class="article-metadata">
-            <a class="mr-2" href="#">{{category.user.user.username}}</a>
+            <a class="mr-2" href="{% url 'catlin:users_categories' category.user.user.username %}">{{category.user.user.username}}</a>
             <small class="text-muted">{{category.last_modified|date:"D d, Y"}}</small>
             <small class="text-muted float-right">{{category.page_count}} link{{category.page_count|pluralize}}</small>
           </div>

@@ -82,11 +82,13 @@ function postComment() {
       type:'M',
     },
     success: function(json) {
-      $('#new-comment').val('');
-      comment = json;
-      $('#comments').prepend(mainCommentHtml(json.id, json.content, json.username, json.last_modified, json.like_count, json.dislike_count));
-      console.log(comment);
-      console.log('Comment posted successfully!');
+      if(json.username) {
+        $('#new-comment').val('');
+        comment = json;
+        $('#comments').prepend(mainCommentHtml(json.id, json.content, json.username, json.last_modified, json.like_count, json.dislike_count));
+        console.log(comment);
+        console.log('Comment posted successfully!');
+      }
     },
     error: function(xhr,errmsg,err) {
       alert('Encountered error: '+errmsg);
@@ -110,11 +112,13 @@ function postNestedComment(commentid) {
       type:'N',
     },
     success: function(json) {
-      $('#new-comment'+commentid).val('');
-      $('#see-replies-btn'+commentid).html(json.parent_comment_count+' Replies');
-      $('#div_see_replies'+commentid).prepend(nestedCommentsHtml(json.username, json.id, json.content, json.like_count, json.dislike_count));
-      console.log(json);
-      console.log('Comment posted successfully!');
+      if(json.username) {
+        $('#new-comment'+commentid).val('');
+        $('#see-replies-btn'+commentid).html(json.parent_comment_count+' Replies');
+        $('#div_see_replies'+commentid).prepend(nestedCommentsHtml(json.username, json.id, json.content, json.like_count, json.dislike_count));
+        console.log(json);
+        console.log('Comment posted successfully!');
+      }
     },
     error: function(xhr,errmsg,err) {
       alert('Encountered error: '+errmsg);

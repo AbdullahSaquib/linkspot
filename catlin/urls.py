@@ -6,6 +6,7 @@ urlpatterns = [
     path("", views.index, name='index'),
     path("about/", views.about, name='about'),
     path("<int:category_id>/", views.category, name='category'),
+    path("user/<str:username>/", views.users_categories, name='users_categories'),
     path("new-link-group/", views.add_category, name='add_category'),
     path("<int:category_id>/add-page/", views.add_page, name='add_page'),
     path("<int:category_id>/update/", views.update_category, name='update_category'),

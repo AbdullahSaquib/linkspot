@@ -1,15 +1,29 @@
 {% extends 'base.html' %}
 {% block content %}
+<div class="content-section">
+
+    <form class="mb-4" action="{% url 'catlin:search' %}" method="GET">
+        <input class="col-md-9" type="text" name="search_string" value="" placeholder="Linkspot Search">
+        <input class="btn btn-outline-info" type="submit" value="Search">
+    </form>
 
 <h2>Search Results</h2>
 <div class="search-categories">
   <h3>Link Groups</h3>
   {% if search_result_cats %}
   {% for category in search_result_cats %}
-    <a href="{% url 'catlin:category' category.id %}">{{category.title}}</a><span> ({{category.page_count}} pages)</span>
-    <p>Created By: {{category.user.user.username}}, Last Modified: {{category.last_modified}}</p>
-    <p>Likes: {{category.like_count}}, Dislikes: {{category.dislike_count}}</p>
-    <p>{{category.summary}}</p>
+  <article class="media content-section">
+    <img class="rounded-circle article-img" src="{{category.user.image.url}}"/>
+    <div class="media-body">
+      <div class="article-metadata">
+        <a class="mr-2" href="{% url 'catlin:users_categories' category.user.user.username %}">{{category.user.user.username}}</a>
+        <small class="text-muted">{{category.last_modified|date:"D d, Y"}}</small>
+        <small class="text-muted float-right">{{category.page_count}} link{{category.page_count|pluralize}}</small>
+      </div>
+      <h2><a href="{% url 'catlin:category' category.id %}" class="article-title">{{category.title}}</a></h2>
+      <p class="article-content">{{category.summary}}</p>
+    </div>
+  </article>
   {% endfor %}
   {% else %}
   <strong>No linkgroups matched with your search.</strong>
@@ -20,17 +34,13 @@
   <h3>Pages</h3>
   {% if search_result_pages %}
   {% for page in search_result_pages %}
-    <a href="{% url 'catlin:goto_page' page.id %}">{{page.title}}</a><span> ({{page.views}} views)</span>
-    <p>Likes: {{page.like_count}}, Dislikes: {{page.dislike_count}}</p>
+    <a href="{% url 'catlin:goto_page' page.id %}">{{page.title}}</a><span> ({{page.views}} view{{page.views|pluralize}})</span>
     <p>{{page.summary}}</p>
+    <p><strong>Category: </strong><a href="{% url 'catlin:category' page.category.id %}">{{page.category.title}}</a></p>
   {% endfor %}
   {% else %}
   <strong>No pages matched with your search.</strong>
   {% endif %}
 </div>
-
-<div class="search-pages">
-
 </div>
-
 {% endblock %}

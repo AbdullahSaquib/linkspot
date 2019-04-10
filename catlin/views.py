@@ -110,13 +110,21 @@ def index(request):
     categories = Category.objects.all()
     return render(request, 'catlin/index.html', {'categories':categories})
 
+def users_categories(request, username):
+    try:
+        author = Profile.objects.get(user__username = username)
+    except Profile.DoesNotExist:
+        return render(request, 'catlin/not_exist.html', {'type':'user'})
+    categories = Category.objects.filter(user=author)
+    return render(request, 'catlin/index.html', {'categories':categories})
+
 def category(request, category_id):
     comment_index = 0 #some request object
     no_of_comments = 5 #fixed see more comments
     try:
         category = Category.objects.get(id=category_id)
     except Category.DoesNotExist:
-        return render(request, 'catlin/cat_not_exist.html', {})
+        return render(request, 'catlin/not_exist.html', {'type':'category'})
     category.views += 1
     category.save()
     pages = Page.objects.filter(category=category).order_by('-like_count')
@@ -157,7 +165,7 @@ def add_page(request, category_id):
     try:
         category = Category.objects.get(id=category_id)
     except Category.DoesNotExist:
-        return render(request, 'catlin/cat_not_exist.html', {})
+        return render(request, 'catlin/not_exist.html', {'type':'category'})
     if request.method == 'POST' and request.user == category.user.user:
         form = AddPageForm(request.POST)
         if form.is_valid():
@@ -186,7 +194,7 @@ def delete_page(request, page_id):
     try:
         page = Page.objects.get(id=page_id)
     except Page.DoesNotExist:
-        return render(request, 'catlin/page_not_exist.html', {})
+        return render(request, 'catlin/not_exist.html', {'type':'page'})
     user = page.category.user
     if user.user == request.user:
         return render(request, 'catlin/verify_page_delete.html', {'page':page})
@@ -197,7 +205,7 @@ def delete_page_verify(request, page_id):
     try:
         page = Page.objects.get(id=page_id)
     except Page.DoesNotExist:
-        return render(request, 'catlin/page_not_exist.html', {})
+        return render(request, 'catlin/not_exist.html', {'type':'page'})
     category = page.category
     user = category.user
     if user.user == request.user and request.method=='POST':
@@ -213,7 +221,7 @@ def update_category(request, category_id):
     try:
         category = Category.objects.get(id=category_id)
     except Category.DoesNotExist:
-        return render(request, 'catlin/cat_not_exist.html', {})
+        return render(request, 'catlin/not_exist.html', {'type':'category'})
     if request.user == category.user.user:
         pages = Page.objects.filter(category=category).order_by('-like_count')
         context = {
@@ -228,24 +236,18 @@ def delete_category(request, category_id):
     try:
         category = Category.objects.get(id=category_id)
     except Category.DoesNotExist:
-        return render(request, 'catlin/cat_not_exist.html', {})
+        return render(request, 'catlin/not_exist.html', {'type':'category'})
     user = category.user
     if user.user == request.user:
         return render(request, 'catlin/verify_category_delete.html', {'page':category})
     return render(request, 'catlin/not_authorised.html',{})
-    # if request.method == 'POST' and user.user == request.user:
-    #     category.delete()
-    #     user.category_count -= 1
-    #     user.save()
-    #     return HttpResponseRedirect(reverse('catlin:del_cat_successfull'))
-    # return render(request, 'catlin/not_authorised.html',{})
 
 @login_required
 def delete_category_verified(request, category_id):
     try:
         category = Category.objects.get(id=category_id)
     except Category.DoesNotExist:
-        return render(request, 'catlin/cat_not_exist.html', {})
+        return render(request, 'catlin/not_exist.html', {'type':'category'})
     user = category.user
     if user.user == request.user and request.method=='POST':
         category.delete()
@@ -266,7 +268,7 @@ def add_comment(request):
         try:
             category = Category.objects.get(id=category_id)
         except Category.DoesNotExist:
-            return render(request, 'catlin/cat_not_exist.html', {})
+            return render(request, 'catlin/not_exist.html', {'type':'category'})
         if request.POST['type'] == 'N':
             type = 'N'
             try:
@@ -275,7 +277,7 @@ def add_comment(request):
                 parent_comment.save()
                 print(parent_comment.comment_count)
             except Comment.DoesNotExist:
-                return render(request, 'catlin/cat_not_exist.html', {})
+                return render(request, 'catlin/not_exist.html', {'type':'category'})
         print(user, parent_comment,type, comment_content, category_id)
         comment = Comment(
             content = comment_content,
@@ -373,4 +375,4 @@ def see_replies(request):
 
 @login_required
 def del_cat_successfull(request):
-    return render(request, 'catlin/del_cat_success.html',{})
+    return render(request, 'catlin/not_exist.html', {'type':'category'})
