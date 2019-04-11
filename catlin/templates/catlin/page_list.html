@@ -17,6 +17,16 @@
 
     {% if pages %}
       {% for page in pages %}
+        <p class="float-right">
+          <strong id="like_page_count{{page.id}}">{{ page.like_count }}</strong>
+          <button class="btn btn-info btn-sm like_page" id="like_page{{page.id}}" data-pageid="{{page.id}}" type="button">
+          Like
+          </button>
+          <strong id="dislike_page_count{{page.id}}">{{ page.dislike_count }}</strong>
+          <button class="btn btn-secondary btn-sm dislike_page" id="dislike_page{{page.id}}" data-pageid="{{page.id}}" type="button">
+          Dislike
+          </button>
+        </p>
         <a href="{% url 'catlin:goto_page' page.id %}">{{page.title}}</a><span> ({{page.views}} view{{page.views|pluralize}})</span>
         <p>{{page.summary}}</p>
         <p><strong>Linkgroup: </strong><a href="{% url 'catlin:category' page.category.id %}">{{page.category.title}}</a></p>

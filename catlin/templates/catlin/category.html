@@ -29,7 +29,9 @@
 </article>
 
 <!-- PAGES SECTION -->
-<h3 class="border-bottom pb-2">Links <small>({{category.page_count}})</small></h3>
+<h3 class="border-bottom pb-2">Links
+  <small>({{category.page_count}})</small>
+</h3>
 {% if pages %}
 {% for page in pages %}
 <p class="float-right">
@@ -45,6 +47,10 @@
 <a href="{% url 'catlin:goto_page' page.id %}">{{page.title}}</a> <span>({{page.views}} view{{page.views|pluralize}})</span>
  <p class="pt-2 pb-4">{{page.summary}}</p>
 {% endfor %}
+<div class="row justify-content-center">
+  <a href="{% url 'catlin:category_pages' category.id %}" class="btn btn-link">See All</a>
+</div>
+
 {% else %}
 <strong>No pages in this category yet.</strong>
 {% endif %}

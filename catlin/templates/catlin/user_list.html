@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="content-section">
+
+    <form class="mb-4" action="{% url 'catlin:search_users' %}" method="GET">
+        <input class="col-md-9" type="text" name="search_string" value="" placeholder="Search Users">
+        <input class="btn btn-outline-info" type="submit" value="Search">
+    </form>
+
+    <h2 class="border-bottom mb-4">{{heading}}</h2>
+    {% if users %}
+    {% for user in users %}
+      <article class="media content-section">
+        <img class="rounded-circle article-img" src="{{user.image.url}}"/>
+        <div class="media-body">
+          <div class="">
+            <a class="mr-2" href="{% url 'catlin:users_categories' user.user.username %}">{{user.user.username}}</a>
+            <small class="text-muted float-right">Likes: {{user.like_count}}</small>
+             <small class="text-muted float-right mr-2">Dislikes: {{user.dislike_count}}</small>
+          </div>
+          <small class="text-muted">Linkgroups: {{user.category_count}}</small>
+        </div>
+      </article>
+    {% endfor %}
+
+      <div class="btn-group">
+          {% if users.has_previous %}
+            <a class="btn btn-outline-info mb-4" href="?page=1">First</a>
+            <a class="btn btn-outline-info mb-4" href="?page={{users.previous_page_number}}">Previous</a>
+          {% endif %}
+          {% for num in users.paginator.page_range %}
+            {% if users.number == num %}
+              <a class="btn btn-info mb-4" href="?page={{num}}">{{num}}</a>
+            {% elif num > users.number|add:'-3' and num < users.number|add:'3' %}
+              <a class="btn btn-outline-info mb-4" href="?page={{num}}">{{num}}</a>
+            {% endif %}
+          {% endfor %}
+          {% if users.has_next %}
+            <a class="btn btn-outline-info mb-4" href="?page={{users.next_page_number}}">Next</a>
+            <a class="btn btn-outline-info mb-4" href="?page={{users.paginator.num_pages}}">Last</a>
+          {% endif %}
+      </div>
+
+    {% else %}
+      <p><strong>No user matched your query.</strong></p>
+    {% endif %}
+
+</div>
+
+
+{% endblock %}

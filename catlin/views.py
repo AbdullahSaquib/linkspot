@@ -67,7 +67,7 @@ def like_my_model(my_request, entity_model, like_model):
                 entity_obj.user.save()
     return {'likes':likes, 'dislikes':dislikes}
 
-def get_search_categories(search_string, max_results = 5, threshold = 0):
+def get_search_categories(search_string, max_results = 25, threshold = 0):
     search_result_cats = []
     cat_score_list = []
     cat_id_list = []
@@ -87,7 +87,7 @@ def get_search_categories(search_string, max_results = 5, threshold = 0):
             cat_score_list[index] = 0
     return search_result_cats
 
-def get_search_pages(search_string, max_results = 5, threshold = 0):
+def get_search_pages(search_string, max_results = 25, threshold = 0):
     search_result_pages = []
     page_score_list = []
     page_id_list = []
@@ -105,6 +105,25 @@ def get_search_pages(search_string, max_results = 5, threshold = 0):
             search_result_pages.append(page_list.get(id=page_id_list[index]))
             page_score_list[index] = 0
     return search_result_pages
+
+def get_search_users(search_string, max_results = 25, threshold = 0):
+    search_result_users = []
+    user_score_list = []
+    user_id_list = []
+    user_list = Profile.objects.all()
+    #Filling page_score_list, page_id_list
+    for user in user_list:
+        user_score_list.append(compare_strings(search_string, user.user.username))
+        user_id_list.append(user.id)
+
+    #Collecting matched ids
+    for i in range(0, max_results):
+        max1 = max(user_score_list)
+        if max1 > threshold:
+            index = user_score_list.index(max1)
+            search_result_users.append(user_list.get(id=user_id_list[index]))
+            user_score_list[index] = 0
+    return search_result_users
 
 # Create your views here.
 def index(request):
@@ -142,7 +161,7 @@ def category(request, category_id):
         return render(request, 'catlin/not_exist.html', {'type':'category'})
     category.views += 1
     category.save()
-    pages = Page.objects.filter(category=category).order_by('-like_count')
+    pages = Page.objects.filter(category=category).order_by('-like_count')[:5]
     main_comments = Comment.objects.filter(category=category, depth='M').order_by('-last_modified')[comment_index:comment_index+no_of_comments]
     main_comment_form = AddCommentForm()
     context = {
@@ -152,6 +171,22 @@ def category(request, category_id):
         'main_comment_form':main_comment_form,
     }
     return render(request, 'catlin/category.html', context)
+
+def category_pages(request, category_id):
+    try:
+        category = Category.objects.get(id=category_id)
+    except Category.DoesNotExist:
+        return render(request, 'catlin/not_exist.html', {'type':'category'})
+    page_list = Page.objects.filter(category=category)
+    paginator = Paginator(page_list, 5)
+    page_no = request.GET.get('page')
+    pages = paginator.get_page(page_no)
+    context = {
+        'pages':pages,
+        'heading':category.title,
+        'type':'category pages',
+    }
+    return render(request, 'catlin/page_list.html', context)
 
 @login_required
 def add_category(request):
@@ -254,8 +289,8 @@ def delete_category(request, category_id):
         return render(request, 'catlin/not_exist.html', {'type':'category'})
     user = category.user
     if user.user == request.user:
-        return render(request, 'catlin/verify_category_delete.html', {'page':category})
-    return render(request, 'catlin/not_authorised.html',{})
+        return render(request, 'catlin/verify_category_delete.html', {'category':category})
+    return render(request, 'catlin/not_authorised.html')
 
 @login_required
 def delete_category_verified(request, category_id):
@@ -347,8 +382,18 @@ def search(request):
     }
     return render(request, 'catlin/search.html', context)
 
-def search_category(request, category_id):
-    return HttpResponse("Searching category feature coming soon.")
+def search_users(request):
+    search_string = request.GET['search_string']
+    user_list = get_search_users(search_string, max_results=10, threshold = 0.25)
+    paginator = Paginator(user_list, 5)
+    page_no = request.GET.get('page')
+    users = paginator.get_page(page_no)
+    context = {
+        'users': users,
+        'heading':search_string,
+        'type':'users search',
+    }
+    return render(request, 'catlin/user_list.html', context)
 
 @login_required
 def like_category(request):
@@ -376,7 +421,7 @@ def goto_page(request, page_id):
     return redirect(page.url)
 
 def about(request):
-    return HttpResponse("Linkspot is a social link sharing platform.")
+    return render(request, 'catlin/about.html')
 
 def see_replies(request):
     main_comment_id = request.GET['main_comment_id']
@@ -408,3 +453,37 @@ def see_replies(request):
 @login_required
 def del_cat_successfull(request):
     return render(request, 'catlin/not_exist.html', {'type':'category'})
+
+def latest_categories(request):
+    category_list = Category.objects.all().order_by('-last_modified')
+    paginator = Paginator(category_list, 5)
+    page_no = request.GET.get('page')
+    categories = paginator.get_page(page_no)
+    context = {
+        'categories':categories,
+        'heading':'Latest Linkgroups'
+    }
+    return render(request, 'catlin/category_list.html', context)
+
+def most_liked_categories(request):
+    category_list = Category.objects.all().order_by('-like_count')
+    paginator = Paginator(category_list, 5)
+    page_no = request.GET.get('page')
+    categories = paginator.get_page(page_no)
+    context = {
+        'categories':categories,
+        'heading':'Most Liked Linkgroups'
+    }
+    return render(request, 'catlin/category_list.html', context)
+
+def search_users_page(request):
+    user_list = Profile.objects.all()
+    paginator = Paginator(user_list, 5)
+    page_no = request.GET.get('page')
+    users = paginator.get_page(page_no)
+    context = {
+        'users': users,
+        'heading':'All Users',
+        'type':'users search',
+    }
+    return render(request, 'catlin/user_list.html', context)

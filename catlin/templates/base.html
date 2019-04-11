@@ -8,7 +8,7 @@
   <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous"> -->
   <link rel="stylesheet" href="{% static '/bootstrap/css/bootstrap.min.css' %}">
   <link rel="stylesheet" href="{% static '/catlin/basestyle.css' %}">
-  <title>Welcome to LinkSpot</title>
+  <title>LinkSpot</title>
 
 
 </head>
@@ -54,13 +54,12 @@
         </div>
         <div class="col-md-4">
           <div class="content-section">
-            <h3>Our Sidebar</h3>
-            <p class='text-muted'>You can put any information here you'd like.
+            <h3>Useful Links</h3>
+            <p class='text-muted'>Welcome to LinkSpot
               <ul class="list-group">
-                <li class="list-group-item list-group-item-light">Latest Posts</li>
-                <li class="list-group-item list-group-item-light">Announcements</li>
-                <li class="list-group-item list-group-item-light">Calendars</li>
-                <li class="list-group-item list-group-item-light">etc</li>
+                <a href="{% url 'catlin:latest_categories' %}" class="list-group-item list-group-item-light">Latest Linkgroups</a>
+                <a href="{% url 'catlin:most_liked_categories' %}" class="list-group-item list-group-item-light">Most Liked Linkgroups</a>
+                <a href="{% url 'catlin:search_users_page' %}" class="list-group-item list-group-item-light">Search Users</a>
               </ul>
             </p>
           </div>
