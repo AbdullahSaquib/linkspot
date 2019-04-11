@@ -1,23 +1,41 @@
-def compare_words(wd1, wd2):
-    marks=0
-    score=0
-    len1 = len(wd1)
-    len2 = len(wd2)
-    wd1 = wd1.lower()
-    wd2 = wd2.lower()
-    if len1 < len2:
-        ln = len1
-    else:
-        ln = len2
-    for i in range(0,ln):
-        if wd1[i] == wd2[i]:
-            marks += 1.0
-        else:
-            marks -= 0.5
-    score = marks/ln
-    if score < 0:
-        return 0
-    return score
+def compare_words(search_word, db_word):
+    db_wd = db_word.lower() #is
+    s_wd = search_word.lower() #summary
+    db_wd_len = len(db_word)
+    s_wd_len = len(s_wd)
+    mc = 1
+    ml = 0.5
+    mr = 0.5
+    score = 0
+    marks = 0.0
+    for i in range(0, s_wd_len):
+        try :
+            if s_wd[i] == db_wd[i]:
+                marks += mc
+                # print(s_wd[i], marks)
+                continue
+            else:
+                raise
+        except :
+            try :
+                if s_wd[i] == db_wd[i+1]:
+                    marks += ml
+                    # print(s_wd[i+1], marks)
+                    continue
+                else:
+                    raise
+            except:
+                try :
+                    if s_wd[i] == db_wd[i-1]:
+                        marks += ml
+                        # print(s_wd[i+1], marks)
+                except:
+                    pass
+
+    if db_wd_len < s_wd_len:
+        return marks/db_wd_len
+    else :
+        return marks/s_wd_len
 
 def compare_strings(search_string, db_string):
     search_words_list = search_string.split()
