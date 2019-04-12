@@ -53,3 +53,12 @@ NEW Functionality
   then return & else return ?
   This will help me in using single template for both all categories, users_categories
   and category search.
+
+2. Using signal increase and decrease like, dislike, comment, linkgroup, page counts etc.
+
+Not Working
+1. adding likes is not changing users like_count.
+  - Like dislike category results:
+    increase/decrease category likes by one, increase/decrease the users likes by one,
+  - Like/dislike page or comments results:
+    increase/decrease page or comments likes/dislikes by one

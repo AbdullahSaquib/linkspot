@@ -36,8 +36,8 @@ def like_my_model(my_request, entity_model, like_model):
     if entity_id:
         entity_obj = entity_model.objects.get(id=int(entity_id))
         if entity_obj:
-            likes = entity_obj.like_count
-            dislikes = entity_obj.dislike_count
+            # likes = entity_obj.like_count #
+            # dislikes = entity_obj.dislike_count #
             try:
                 like_obj = like_model.objects.get(entity=entity_obj, user=user)
                 if like_obj.type == like_type:
@@ -58,15 +58,14 @@ def like_my_model(my_request, entity_model, like_model):
             elif like_type == 'D':
                 likes += not_like_type_count
                 dislikes += like_type_count
-            entity_obj.like_count = likes
-            entity_obj.dislike_count = dislikes
+            entity_obj.like_count += likes
+            entity_obj.dislike_count += dislikes
             entity_obj.save()
             if entity_model == Category and entity_obj.user:
-                entity_obj.user.like_count = likes
-                entity_obj.user.dislike_count = dislikes
+                entity_obj.user.like_count += likes
+                entity_obj.user.dislike_count += dislikes
                 entity_obj.user.save()
-    return {'likes':likes, 'dislikes':dislikes}
-
+    return {'likes':entity_obj.like_count, 'dislikes':entity_obj.dislike_count}
 def get_search_categories(search_string, max_results = 25, threshold = 0):
     search_result_cats = []
     cat_score_list = []
@@ -477,7 +476,7 @@ def most_liked_categories(request):
     return render(request, 'catlin/category_list.html', context)
 
 def search_users_page(request):
-    user_list = Profile.objects.all()
+    user_list = Profile.objects.all().order_by('-category_count')
     paginator = Paginator(user_list, 5)
     page_no = request.GET.get('page')
     users = paginator.get_page(page_no)
